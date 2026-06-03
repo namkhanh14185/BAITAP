@@ -28,11 +28,13 @@ Node* initial_bst(int a[], int so_phan_tu) {
 }
 
 Node* Search(Node* goc, int khoa, int &so_buoc) {
-    if (goc == nullptr) return nullptr;
-    so_buoc++;
-    if (goc->du_lieu == khoa) return goc;
-    if (khoa < goc->du_lieu) return Search(goc->trai, khoa, so_buoc);
-    return Search(goc->phai, khoa, so_buoc);
+    while (goc != nullptr) {
+        so_buoc++;
+        if (goc->du_lieu == khoa) return goc;
+        if (khoa < goc->du_lieu) goc = goc->trai;
+        else goc = goc->phai;
+    }
+    return nullptr;
 }
 
 int main() {
