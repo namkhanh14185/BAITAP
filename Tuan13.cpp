@@ -13,12 +13,20 @@ struct Node {
 };
 
 void add_node(Node* &goc, int gia_tri) {
+    Node* moi = new Node(gia_tri);
     if (goc == nullptr) {
-        goc = new Node(gia_tri);
+        goc = moi;
         return;
     }
-    if (gia_tri < goc->du_lieu) add_node(goc->trai, gia_tri);
-    else add_node(goc->phai, gia_tri);
+    Node* hien_tai = goc;
+    Node* cha = nullptr;
+    while (hien_tai != nullptr) {
+        cha = hien_tai;
+        if (gia_tri < hien_tai->du_lieu) hien_tai = hien_tai->trai;
+        else hien_tai = hien_tai->phai;
+    }
+    if (gia_tri < cha->du_lieu) cha->trai = moi;
+    else cha->phai = moi;
 }
 
 Node* initial_bst(int a[], int so_phan_tu) {
