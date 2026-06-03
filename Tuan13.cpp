@@ -15,7 +15,7 @@ struct Node {
 Node* add_node(Node* goc, int gia_tri) {
     if (goc == nullptr) return new Node(gia_tri);
     if (gia_tri < goc->du_lieu) goc->trai = add_node(goc->trai, gia_tri);
-    else if (gia_tri > goc->du_lieu) goc->phai = add_node(goc->phai, gia_tri);
+    else goc->phai = add_node(goc->phai, gia_tri); // Nhận phần tử trùng sang phải
     return goc;
 }
 
