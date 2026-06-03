@@ -12,16 +12,18 @@ struct Node {
     }
 };
 
-Node* add_node(Node* goc, int gia_tri) {
-    if (goc == nullptr) return new Node(gia_tri);
-    if (gia_tri < goc->du_lieu) goc->trai = add_node(goc->trai, gia_tri);
-    else goc->phai = add_node(goc->phai, gia_tri); // Nhận phần tử trùng sang phải
-    return goc;
+void add_node(Node* &goc, int gia_tri) {
+    if (goc == nullptr) {
+        goc = new Node(gia_tri);
+        return;
+    }
+    if (gia_tri < goc->du_lieu) add_node(goc->trai, gia_tri);
+    else add_node(goc->phai, gia_tri);
 }
 
 Node* initial_bst(int a[], int so_phan_tu) {
     Node* goc = nullptr;
-    for (int i = 0; i < so_phan_tu; i++) goc = add_node(goc, a[i]);
+    for (int i = 0; i < so_phan_tu; i++) add_node(goc, a[i]);
     return goc;
 }
 
