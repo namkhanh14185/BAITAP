@@ -24,6 +24,11 @@ int getHeight(Node* n) {
     return n->height;
 }
 
+int getBalance(Node* n) {
+    if (n == nullptr) return 0;
+    return getHeight(n->left) - getHeight(n->right);
+}
+
 Node* insert(Node* node, int key) {
     if (node == nullptr) return newNode(key);
     if (key < node->key)
@@ -34,6 +39,7 @@ Node* insert(Node* node, int key) {
         return node;
 
     node->height = 1 + max(getHeight(node->left), getHeight(node->right));
+    int balance = getBalance(node);
     return node;
 }
 
