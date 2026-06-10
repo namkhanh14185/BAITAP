@@ -84,12 +84,37 @@ void preOrder(Node* root) {
     }
 }
 
+void inOrder(Node* root) {
+    if (root != nullptr) {
+        inOrder(root->left);
+        cout << root->key << " ";
+        inOrder(root->right);
+    }
+}
+
+void postOrder(Node* root) {
+    if (root != nullptr) {
+        postOrder(root->left);
+        postOrder(root->right);
+        cout << root->key << " ";
+    }
+}
+
 int main() {
     Node* root = nullptr;
     int arr[] = {32, 51, 27, 83, 96, 11, 45, 75, 66};
-    for (int i = 0; i < 9; i++) {
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    for (int i = 0; i < n; i++) {
         root = insert(root, arr[i]);
     }
+
     preOrder(root);
+    cout << "\n";
+    inOrder(root);
+    cout << "\n";
+    postOrder(root);
+    cout << "\n";
+
     return 0;
 }
