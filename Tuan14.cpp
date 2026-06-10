@@ -86,8 +86,8 @@ void preOrder(Node* root) {
 
 int main() {
     Node* root = nullptr;
-    int arr[] = {32, 51, 27, 83, 96, 11, 45, 75};
-    for (int i = 0; i < 8; i++) {
+    int arr[] = {32, 51, 27, 83, 96, 11, 45, 75, 66};
+    for (int i = 0; i < 9; i++) {
         root = insert(root, arr[i]);
     }
     preOrder(root);
