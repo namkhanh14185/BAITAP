@@ -65,7 +65,14 @@ Node* insert(Node* node, int key) {
         return rightRotate(node);
     if (balance < -1 && key > node->right->key)
         return leftRotate(node);
-
+    if (balance > 1 && key > node->left->key) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+    if (balance < -1 && key < node->right->key) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
     return node;
 }
 
@@ -79,8 +86,8 @@ void preOrder(Node* root) {
 
 int main() {
     Node* root = nullptr;
-    int arr[] = {32, 51, 27, 83, 96, 11};
-    for (int i = 0; i < 6; i++) {
+    int arr[] = {32, 51, 27, 83, 96, 11, 45, 75};
+    for (int i = 0; i < 8; i++) {
         root = insert(root, arr[i]);
     }
     preOrder(root);
