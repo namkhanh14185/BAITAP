@@ -29,6 +29,16 @@ int getBalance(Node* n) {
     return getHeight(n->left) - getHeight(n->right);
 }
 
+Node* leftRotate(Node* x) {
+    Node* y = x->right;
+    Node* T2 = y->left;
+    y->left = x;
+    x->right = T2;
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+    return y;
+}
+
 Node* insert(Node* node, int key) {
     if (node == nullptr) return newNode(key);
     if (key < node->key)
@@ -40,6 +50,10 @@ Node* insert(Node* node, int key) {
 
     node->height = 1 + max(getHeight(node->left), getHeight(node->right));
     int balance = getBalance(node);
+
+    if (balance < -1 && key > node->right->key)
+        return leftRotate(node);
+
     return node;
 }
 
@@ -53,8 +67,8 @@ void preOrder(Node* root) {
 
 int main() {
     Node* root = nullptr;
-    int arr[] = {32, 51, 27, 83};
-    for (int i = 0; i < 4; i++) {
+    int arr[] = {32, 51, 27, 83, 96};
+    for (int i = 0; i < 5; i++) {
         root = insert(root, arr[i]);
     }
     preOrder(root);
