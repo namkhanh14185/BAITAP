@@ -1,9 +1,8 @@
 #include <iostream>
 #include <string>
-
 using namespace std;
-
 const int N = 11;
+const int INF = 1e9; 
 
 const string city[N] = {
     "Ha Noi", "Son Tay", "Hoa Binh", "Phu Ly", "Hung Yen",
@@ -25,43 +24,46 @@ void them_Canh(int u, int v, int w) {
     p = new Node{u, w, head[v]};
     head[v] = p;
 }
-void BFS_LienThong(int start, bool visited[]) {
-    int q[N];
-    int front = 0, rear = 0;
+void Dijkstra(int start, int dest) {
+    int dist[N];
+    bool optimized[N] = {false}; 
 
-    visited[start] = true;
-    q[rear++] = start;
+    for (int i = 0; i < N; i++) dist[i] = INF;
+    dist[start] = 0;
 
-    while (front < rear) {
-        int u = q[front++];
+    for (int step = 0; step < N; step++) {
+        int u = -1, min_d = INF;
+        for (int i = 0; i < N; i++) {
+            if (!optimized[i] && dist[i] < min_d) {
+                min_d = dist[i];
+                u = i;
+            }
+        }
+
+        if (u == -1 || u == dest) break;
+        optimized[u] = true;
         Node* temp = head[u];
         while (temp != nullptr) {
             int v = temp->vertex;
-            if (!visited[v]) {
-                visited[v] = true;
-                q[rear++] = v;
+            int w = temp->weight;
+            if (!optimized[v] && dist[u] + w < dist[v]) {
+                dist[v] = dist[u] + w;
             }
             temp = temp->next;
         }
     }
-}
 
-int dem_ThanhPhanLienThong() {
-    bool visited[N] = {false};
-    int soVung = 0;
-
-    for (int i = 0; i < N; i++) {
-        if (!visited[i]) {
-            soVung++;
-            cout << "Vung lien thong thu " << soVung << " bat dau tu: " << city[i] << "\n";
-            BFS_LienThong(i, visited);
-        }
+    cout << "Ket qua tim duong di\n";
+    if (dist[dest] == INF) {
+        cout << "Khong co duong di tu " << city[start] << " den " << city[dest] << "\n";
+    } else {
+        cout << "Quang duong ngan nhat tu [" << city[start] << "] den [" << city[dest] << "] la: " << dist[dest] << " km\n";
     }
-    return soVung;
 }
 
 void giai_phong() {
-    for (int i = 0; i < N; i++) {
+    for (int i = 0; i < N; i++) 
+    {
         Node* temp = head[i];
         while (temp != nullptr) {
             Node* nextNode = temp->next;
@@ -74,13 +76,11 @@ void giai_phong() {
 
 int main() {
     them_Canh(0, 1, 42); them_Canh(0, 2, 76); them_Canh(0, 3, 60); 
-    them_Canh(0, 5, 58); them_Canh(3, 4, 35); them_Canh(4, 5, 25);
+    them_Canh(0, 5, 58); them_Canh(0, 9, 30); them_Canh(0, 10, 75); 
+    them_Canh(3, 4, 35); them_Canh(4, 5, 25); them_Canh(5, 6, 45); 
     them_Canh(6, 7, 40); them_Canh(7, 8, 50); them_Canh(8, 9, 25); 
-    them_Canh(9, 10, 45);
-
-    cout << "Kiem tra so thanh phan lien thong\n";
-    int ketQua = dem_ThanhPhanLienThong();
-    cout << "\nTong so vung biet lap tren ban do: " << ketQua << "\n";
+    them_Canh(9, 7, 85);
+    Dijkstra(0, 7);
 
     giai_phong();
     return 0;
