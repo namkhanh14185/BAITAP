@@ -17,7 +17,6 @@ struct Node {
 };
 
 Node* head[N] = {nullptr};
-bool visited[N] = {false}; 
 
 void them_Canh(int u, int v, int w) {
     Node* p = new Node{v, w, head[u]};
@@ -26,18 +25,30 @@ void them_Canh(int u, int v, int w) {
     p = new Node{u, w, head[v]};
     head[v] = p;
 }
-void DFS(int u) {
-    cout << city[u] << " -> ";
-    visited[u] = true;
+void BFS(int start) {
+    bool visited[N] = {false};
+    int q[N];
+    int front = 0, rear = 0;
 
-    Node* temp = head[u];
-    while (temp != nullptr) {
-        int v = temp->vertex;
-        if (!visited[v]) {
-            DFS(v); 
+    visited[start] = true;
+    q[rear++] = start;
+
+    cout << "DUYET BFS (CHIEU RONG) TU HA NOI\n";
+    while (front < rear) {
+        int u = q[front++]; 
+        cout << city[u] << " -> ";
+
+        Node* temp = head[u];
+        while (temp != nullptr) {
+            int v = temp->vertex;
+            if (!visited[v]) {
+                visited[v] = true;
+                q[rear++] = v;
+            }
+            temp = temp->next;
         }
-        temp = temp->next;
     }
+    cout << "END\n";
 }
 
 void giai_phong() {
@@ -59,9 +70,7 @@ int main() {
     them_Canh(6, 7, 40); them_Canh(7, 8, 50); them_Canh(8, 9, 25); 
     them_Canh(9, 7, 85);
 
-    cout << "Duyet BFS (Danh sach ke) tu Ha Noi:\n";
-    DFS(0);
-    cout << "END\n";
+    BFS(0);
 
     giai_phong();
     return 0;
