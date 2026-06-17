@@ -1,68 +1,57 @@
 #include <iostream>
-#include <queue>
 #include <vector>
+#include <queue>
 #include <string>
-#include <algorithm>
 
 using namespace std;
 
 const int N = 11;
+const int INF = 1e9;
 const string city[N] = {
     "Ha Noi", "Son Tay", "Hoa Binh", "Phu Ly", "Hung Yen",
     "Hai Duong", "Hai Phong", "Uong Bi", "Bac Giang", "Bac Ninh", "Thai Nguyen"
 };
 
-void them_Canh(vector<int> adj[], int u, int v) {
-    adj[u].push_back(v); adj[v].push_back(u);
+struct Canh {
+    int v, weight;
+};
+
+void them_Canh(vector<Canh> adj[], int u, int v, int w) {
+    adj[u].push_back({v, w});
+    adj[v].push_back({u, w});
 }
 
-void BFS_TimDuong(const vector<int> adj[], int start, vector<int>& parent) {
-    vector<bool> visited(N, false);
-    queue<int> q;
+void Dijkstra(const vector<Canh> adj[], int start, int dest) {
+    vector<int> dist(N, INF);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 
-    visited[start] = true;
-    q.push(start);
+    dist[start] = 0;
+    pq.push({0, start});
 
-    while (!q.empty()) {
-        int u = q.front();
-        q.pop();
+    while (!pq.empty()) {
+        int d = pq.top().first;
+        int u = pq.top().second;
+        pq.pop();
 
-        for (int v : adj[u]) {
-            if (!visited[v]) {
-                visited[v] = true;
-                parent[v] = u;
-                q.push(v);
+        if (d > dist[u]) continue;
+
+        for (auto edge : adj[u]) {
+            if (dist[u] + edge.weight < dist[edge.v]) {
+                dist[edge.v] = dist[u] + edge.weight;
+                pq.push({dist[edge.v], edge.v});
             }
         }
     }
-}
-
-void in_DuongDi(int start, int dest, const vector<int>& parent) {
-    if (parent[dest] == -1 && start != dest) {
-        cout << "Khong co duong di tu " << city[start] << " den " << city[dest] << "\n";
-        return;
-    }
-    vector<int> path;
-    for (int v = dest; v != -1; v = parent[v]) {
-        path.push_back(v);
-    }
-    reverse(path.begin(), path.end());
-
-    cout << "Duong di ngan nhat: ";
-    for (size_t i = 0; i < path.size(); i++) {
-        cout << city[path[i]] << (i == path.size() - 1 ? "" : " -> ");
-    }
-    cout << "\n";
+    cout << "Khoang cach ngan nhat tu " << city[start] << " den " << city[dest] << " la: " << dist[dest] << " km\n";
 }
 
 int main() {
-    vector<int> adj[N];
-    for (int v : {1, 2, 3, 5, 9, 10}) them_Canh(adj, 0, v);
-    them_Canh(adj, 3, 4); them_Canh(adj, 4, 5); them_Canh(adj, 5, 6);
-    them_Canh(adj, 6, 7); them_Canh(adj, 7, 8); them_Canh(adj, 8, 9); them_Canh(adj, 9, 7);
+    vector<Canh> adj[N];
+    them_Canh(adj, 0, 1, 42);  
+    them_Canh(adj, 0, 5, 58);  
+    them_Canh(adj, 5, 6, 45); 
+    them_Canh(adj, 6, 7, 40); 
 
-    vector<int> parent(N, -1);
-    BFS_TimDuong(adj, 0, parent);
-    in_DuongDi(0, 7, parent); 
+    Dijkstra(adj, 0, 7); 
     return 0;
 }
