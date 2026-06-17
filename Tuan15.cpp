@@ -11,7 +11,6 @@ const string city[N] = {
     "Hai Duong", "Hai Phong", "Uong Bi", "Bac Giang", "Bac Ninh", "Thai Nguyen"
 };
 
-// Sử dụng danh sách kề thay cho ma trận kề
 void them_Canh(vector<int> adj[], int u, int v) {
     adj[u].push_back(v);
     adj[v].push_back(u);
@@ -30,7 +29,7 @@ void BFS(const vector<int> adj[], int start) {
 
         cout << city[u] << "\n";
 
-        // Chỉ duyệt qua các đỉnh thực sự kề với u
+     
         for (int v : adj[u]) {
             if (!visited[v]) {
                 visited[v] = true;
@@ -41,7 +40,7 @@ void BFS(const vector<int> adj[], int start) {
 }
 
 int main() {
-    vector<int> adj[N]; // Mảng các vector
+    vector<int> adj[N]; 
 
     for (int v : {1, 2, 3, 5, 9, 10}) them_Canh(adj, 0, v);
     them_Canh(adj, 3, 4); them_Canh(adj, 4, 5); them_Canh(adj, 5, 6);
