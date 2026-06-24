@@ -37,28 +37,41 @@ void them_canh(DoThi& do_thi, const string& ten_goc, const string& ten_ngon, int
     do_thi.ke[ngon].push_back({goc, trong_so});
 }
 
-void liet_ke_tinh(DoThi& do_thi) {
-    cout << "=== DANH SÁCH CÁC TỈNH TRONG HỆ THỐNG ===\n";
+void cap_nhat_canh(DoThi& do_thi, const string& ten_goc, const string& ten_ngon, int trong_so_moi) {
+    int goc = -1, ngon = -1;
     for (int i = 0; i < do_thi.so_nut; i++) {
-        cout << "- " << do_thi.ten_tinh[i] << "\n";
+        if (do_thi.ten_tinh[i] == ten_goc) goc = i;
+        if (do_thi.ten_tinh[i] == ten_ngon) ngon = i;
     }
-}
+    if (goc == -1 || ngon == -1) return;
 
-void tim_tinh_lan_can(DoThi& do_thi, const string& ten) {
-    int id = -1;
-    for (int i = 0; i < do_thi.so_nut; i++) {
-        if (do_thi.ten_tinh[i] == ten) {
-            id = i;
+    for (size_t i = 0; i < do_thi.ke[goc].size(); i++) {
+        if (do_thi.ke[goc][i].id_lang_gieng == ngon) {
+            do_thi.ke[goc][i].trong_so = trong_so_moi;
             break;
         }
     }
-    if (id == -1) {
-        cout << "Không tìm thấy tỉnh " << ten << " trong hệ thống.\n";
-        return;
+    for (size_t i = 0; i < do_thi.ke[ngon].size(); i++) {
+        if (do_thi.ke[ngon][i].id_lang_gieng == goc) {
+            do_thi.ke[ngon][i].trong_so = trong_so_moi;
+            break;
+        }
     }
-    cout << "CÁC TỈNH LÂN CẬN CỦA " << ten << " ===\n";
-    for (const Canh& canh : do_thi.ke[id]) {
-        cout << "-> " << do_thi.ten_tinh[canh.id_lang_gieng] << " (" << canh.trong_so << " km)\n";
+}
+
+void hien_thi_duong_di(DoThi& do_thi, const string& ten_goc, const string& ten_ngon) {
+    int goc = -1, ngon = -1;
+    for (int i = 0; i < do_thi.so_nut; i++) {
+        if (do_thi.ten_tinh[i] == ten_goc) goc = i;
+        if (do_thi.ten_tinh[i] == ten_ngon) ngon = i;
+    }
+    if (goc == -1 || ngon == -1) return;
+
+    for (const Canh& canh : do_thi.ke[goc]) {
+        if (canh.id_lang_gieng == ngon) {
+            cout << "Quãng đường " << ten_goc << " - " << ten_ngon << ": " << canh.trong_so << " km\n";
+            return;
+        }
     }
 }
 
@@ -68,12 +81,11 @@ int main() {
     DoThi do_thi;
 
     them_canh(do_thi, "Hà nội", "Hải dương", 55);
-    them_canh(do_thi, "Hải dương", "Hưng yên", 40);
-    them_canh(do_thi, "Hà nội", "Phủ lý", 60);
+    hien_thi_duong_di(do_thi, "Hà nội", "Hải dương");
 
-    liet_ke_tinh(do_thi);
-    cout << "\n";
-    tim_tinh_lan_can(do_thi, "Hà nội");
+    cap_nhat_canh(do_thi, "Hà nội", "Hải dương", 50);
+    cout << "[Sau khi cập nhật]\n";
+    hien_thi_duong_di(do_thi, "Hà nội", "Hải dương");
 
     return 0;
 }
