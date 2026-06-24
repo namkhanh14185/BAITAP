@@ -98,7 +98,7 @@ void tim_duong_qua_diem_trung_gian(DoThi& do_thi, const string& tinh_A, const st
     int kc1 = dijkstra_vong(do_thi, tinh_A, tinh_B, chang_1);
     int kc2 = dijkstra_vong(do_thi, tinh_B, tinh_C, chang_2);
 
-    cout << "HÀNH TRÌNH TỪ " << tinh_A << " QUA " << tinh_B << " ĐẾN " << tinh_C << " ===\n";
+    cout << "HÀNH TRÌNH TỪ " << tinh_A << " QUA " << tinh_B << " ĐẾN " << tinh_C << "\n";
     if (kc1 == INF || kc2 == INF) {
         cout << "Không thể thiết lập lộ trình này.\n";
         return;
