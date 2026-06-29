@@ -1,130 +1,145 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
-#define INF 1e9
-#define MAX_NODES 30
+#define VO_CUNG 1e9
+#define SO_NUT_TOI_DA 30
 
 struct Canh {
-    int id_lang_gieng;
+    int ma_lang_gieng;
     int trong_so;
 };
 
-struct DoThi {
-    string ten_tinh[MAX_NODES];
-    vector<Canh> ke[MAX_NODES];
-    int so_nut = 0;
+struct CanhKruskal {
+    int u, v, w;
+    bool operator<(const CanhKruskal& khac) const { return w < khac.w; }
 };
 
-int lay_hoac_them_nut(DoThi& do_thi, const string& ten) {
-    for (int i = 0; i < do_thi.so_nut; i++) {
-        if (do_thi.ten_tinh[i] == ten) {
-            return i;
+class QuanLyGiaoThong {
+private:
+    string ten_tinh[SO_NUT_TOI_DA];
+    vector<Canh> ke[SO_NUT_TOI_DA];
+    int so_nut = 0;
+
+    int lay_hoac_them_nut(const string& ten) {
+        for (int i = 0; i < so_nut; i++) {
+            if (ten_tinh[i] == ten) return i;
+        }
+        ten_tinh[so_nut] = ten;
+        so_nut++;
+        return so_nut - 1;
+    }
+
+    int tim_goc(int i, int cha[]) {
+        if (cha[i] == -1) return i;
+        return cha[i] = tim_goc(cha[i], cha);
+    }
+
+    void gop_nhom(int x, int y, int cha[]) {
+        int goc_x = tim_goc(x, cha);
+        int goc_y = tim_goc(y, cha);
+        if (goc_x != goc_y) cha[goc_x] = goc_y;
+    }
+
+    void in_ma_tran(const int mt[SO_NUT_TOI_DA][SO_NUT_TOI_DA]) {
+        cout << "\n" << setw(12) << " ";
+        for (int i = 0; i < so_nut; i++) cout << setw(12) << ten_tinh[i];
+        cout << "\n";
+        for (int i = 0; i < so_nut; i++) {
+            cout << setw(12) << ten_tinh[i];
+            for (int j = 0; j < so_nut; j++) {
+                if (mt[i][j] == VO_CUNG) cout << setw(12) << "-";
+                else cout << setw(12) << mt[i][j];
+            }
+            cout << "\n";
         }
     }
-    do_thi.ten_tinh[do_thi.so_nut] = ten;
-    do_thi.so_nut++;
-    return do_thi.so_nut - 1;
-}
 
-void them_canh(DoThi& do_thi, const string& ten_goc, const string& ten_ngon, int trong_so) {
-    int goc = lay_hoac_them_nut(do_thi, ten_goc);
-    int ngon = lay_hoac_them_nut(do_thi, ten_ngon);
-
-    do_thi.ke[goc].push_back({ngon, trong_so});
-    do_thi.ke[ngon].push_back({goc, trong_so});
-}
-
-int dijkstra_vong(DoThi& do_thi, const string& ten_bat_dau, const string& ten_ket_thuc, vector<int>& duong_di_phu) {
-    int bat_dau = lay_hoac_them_nut(do_thi, ten_bat_dau);
-    int ket_thuc = lay_hoac_them_nut(do_thi, ten_ket_thuc);
-    int n = do_thi.so_nut;
-
-    int khoang_cach[MAX_NODES];
-    int truy_vet[MAX_NODES];
-    bool da_duyet[MAX_NODES];
-
-    for (int i = 0; i < n; i++) {
-        khoang_cach[i] = INF;
-        truy_vet[i] = -1;
-        da_duyet[i] = false;
+public:
+    void them_duong_di(const string& u, const string& v, int w) {
+        int g = lay_hoac_them_nut(u);
+        int n = lay_hoac_them_nut(v);
+        ke[g].push_back({n, w});
+        ke[n].push_back({g, w});
     }
-    khoang_cach[bat_dau] = 0;
 
-    for (int i = 0; i < n - 1; i++) {
-        int kc_nho_nhat = INF;
-        int u = -1;
+    void prim(const string& ten_bat_dau) {
+        int s = -1;
+        for (int i = 0; i < so_nut; i++) if (ten_tinh[i] == ten_bat_dau) s = i;
+        if (s == -1) return;
 
-        for (int j = 0; j < n; j++) {
-            if (!da_duyet[j] && khoang_cach[j] < kc_nho_nhat) {
-                kc_nho_nhat = khoang_cach[j];
-                u = j;
+        int gia_tri[SO_NUT_TOI_DA], cha[SO_NUT_TOI_DA], mt[SO_NUT_TOI_DA][SO_NUT_TOI_DA];
+        bool da_xet[SO_NUT_TOI_DA] = {false};
+        for (int i = 0; i < so_nut; i++) {
+            gia_tri[i] = VO_CUNG; cha[i] = -1;
+            for (int j = 0; j < so_nut; j++) mt[i][j] = VO_CUNG;
+        }
+        gia_tri[s] = 0;
+        int tong = 0;
+
+        for (int dem = 0; dem < so_nut; dem++) {
+            int min_k = VO_CUNG, u = -1;
+            for (int v = 0; v < so_nut; v++) {
+                if (!da_xet[v] && gia_tri[v] < min_k) { min_k = gia_tri[v]; u = v; }
+            }
+            if (u == -1) break;
+            da_xet[u] = true;
+            tong += gia_tri[u];
+            if (cha[u] != -1) { mt[u][cha[u]] = gia_tri[u]; mt[cha[u]][u] = gia_tri[u]; }
+
+            for (auto& c : ke[u]) {
+                if (!da_xet[c.ma_lang_gieng] && c.trong_so < gia_tri[c.ma_lang_gieng]) {
+                    cha[c.ma_lang_gieng] = u;
+                    gia_tri[c.ma_lang_gieng] = c.trong_so;
+                }
             }
         }
+        cout << "\n" << tong;
+        in_ma_tran(mt);
+    }
 
-        if (u == -1 || u == ket_thuc) break;
-        da_duyet[u] = true;
-
-        for (const Canh& canh : do_thi.ke[u]) {
-            int v = canh.id_lang_gieng;
-            int trong_so = canh.trong_so;
-
-            if (!da_duyet[v] && khoang_cach[u] + trong_so < khoang_cach[v]) {
-                khoang_cach[v] = khoang_cach[u] + trong_so;
-                truy_vet[v] = u;
+    void kruskal() {
+        vector<CanhKruskal> ds_canh;
+        for (int u = 0; u < so_nut; u++) {
+            for (auto& c : ke[u]) {
+                if (u < c.ma_lang_gieng) ds_canh.push_back({u, c.ma_lang_gieng, c.trong_so});
             }
         }
+        sort(ds_canh.begin(), ds_canh.end());
+        int cha[SO_NUT_TOI_DA], mt[SO_NUT_TOI_DA][SO_NUT_TOI_DA];
+        for (int i = 0; i < so_nut; i++) {
+            cha[i] = -1;
+            for (int j = 0; j < so_nut; j++) mt[i][j] = VO_CUNG;
+        }
+        int tong = 0, dem = 0;
+        for (auto& e : ds_canh) {
+            if (dem == so_nut - 1) break;
+            int g_u = tim_goc(e.u, cha), g_v = tim_goc(e.v, cha);
+            if (g_u != g_v) {
+                mt[e.u][e.v] = e.w; mt[e.v][e.u] = e.w;
+                tong += e.w; dem++;
+                gop_nhom(g_u, g_v, cha);
+            }
+        }
+        cout << "\n" << tong;
+        in_ma_tran(mt);
     }
-
-    if (khoang_cach[ket_thuc] == INF) return INF;
-
-    vector<int> tam;
-    int nut_hien_tai = ket_thuc;
-    while (nut_hien_tai != -1) {
-        tam.push_back(nut_hien_tai);
-        nut_hien_tai = truy_vet[nut_hien_tai];
-    }
-    for (int i = tam.size() - 1; i >= 0; i--) {
-        duong_di_phu.push_back(tam[i]);
-    }
-
-    return khoang_cach[ket_thuc];
-}
-
-void tim_duong_qua_diem_trung_gian(DoThi& do_thi, const string& tinh_A, const string& tinh_B, const string& tinh_C) {
-    vector<int> chang_1, chang_2;
-    int kc1 = dijkstra_vong(do_thi, tinh_A, tinh_B, chang_1);
-    int kc2 = dijkstra_vong(do_thi, tinh_B, tinh_C, chang_2);
-
-    cout << "HÀNH TRÌNH TỪ " << tinh_A << " QUA " << tinh_B << " ĐẾN " << tinh_C << "\n";
-    if (kc1 == INF || kc2 == INF) {
-        cout << "Không thể thiết lập lộ trình này.\n";
-        return;
-    }
-
-    cout << "Lộ trình đi: ";
-    for (size_t i = 0; i < chang_1.size(); i++) {
-        cout << do_thi.ten_tinh[chang_1[i]] << " -> ";
-    }
-    for (size_t i = 1; i < chang_2.size(); i++) {
-        cout << do_thi.ten_tinh[chang_2[i]];
-        if (i < chang_2.size() - 1) cout << " -> ";
-    }
-    cout << "\nTotal quãng đường: " << kc1 + kc2 << " km\n";
-}
+};
 
 int main() {
     system("chcp 65001 > nul");
+    QuanLyGiaoThong ql;
+    ql.them_duong_di("Hà nội", "Hải dương", 55);
+    ql.them_duong_di("Hải dương", "Hải phòng", 45);
+    ql.them_duong_di("Hà nội", "Phủ lý", 60);
+    ql.them_duong_di("Hà nội", "Hoà Bình", 75);
+    ql.them_duong_di("Hoà Bình", "Phủ lý", 65);
 
-    DoThi do_thi;
-
-    them_canh(do_thi, "Hà nội", "Hải dương", 55);
-    them_canh(do_thi, "Hải dương", "Hải phòng", 45);
-    them_canh(do_thi, "Hà nội", "Phủ lý", 60);
-
-    tim_duong_qua_diem_trung_gian(do_thi, "Phủ lý", "Hà nội", "Hải phòng");
-
+    ql.prim("Hoà Bình");
+    ql.kruskal();
     return 0;
 }
